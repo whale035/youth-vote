@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
 const { Resend } = require("resend");
@@ -15,6 +16,7 @@ const FROM_EMAIL = process.env.FROM_EMAIL || "onboarding@resend.dev";
 const registrations = [];
 const votes = [];
 const usedVoteTokens = new Set();
+const activeVoteTokens = new Set();
 
 app.use(cors());
 app.use(express.json());
@@ -102,6 +104,9 @@ app.post("/submit", async (req, res) => {
   }
 
   if (type === "verification") {
+    const newVoteToken = crypto.randomUUID();
+    activeVoteTokens.add(newVoteToken);
+
     await sendAdminNotification(
       "Youth Vote - Verification Completed",
       `
@@ -111,6 +116,12 @@ app.post("/submit", async (req, res) => {
       <p>The OTP value itself is not stored or emailed.</p>
       `
     );
+
+    return res.json({
+      success: true,
+      message: "Verification completed",
+      voteToken: newVoteToken
+    });
   }
 
   if (type === "vote") {
@@ -128,6 +139,13 @@ app.post("/submit", async (req, res) => {
       });
     }
 
+    if (!activeVoteTokens.has(voteToken)) {
+      return res.status(403).json({
+        success: false,
+        message: "Invalid voting session token"
+      });
+    }
+
     if (typeof candidate !== "string" || !candidate.trim()) {
       return res.status(400).json({
         success: false,
@@ -141,6 +159,7 @@ app.post("/submit", async (req, res) => {
     });
 
     usedVoteTokens.add(voteToken);
+    activeVoteTokens.delete(voteToken);
 
     await sendAdminNotification(
       "Youth Vote - Anonymous Vote Received",

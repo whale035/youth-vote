@@ -685,7 +685,17 @@
           email: userEmail,
           verified: true
         }
-      );
+      ).then(async response => {
+        if (response && response.voteToken) {
+          voteToken = response.voteToken;
+        }
+
+        setTimeout(() => {
+          goToPage(4);
+        }, 500);
+      });
+
+      return;
 
       setTimeout(() => {
         goToPage(4);
