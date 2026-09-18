@@ -14,6 +14,7 @@ const FROM_EMAIL = process.env.FROM_EMAIL || "onboarding@resend.dev";
 
 const registrations = [];
 const votes = [];
+const usedVoteTokens = new Set();
 
 app.use(cors());
 app.use(express.json());
@@ -54,7 +55,7 @@ async function sendAdminNotification(subject, html) {
 }
 
 app.post("/submit", async (req, res) => {
-  const { type, email, candidate, verified } = req.body;
+  const { type, email, candidate, verified, voteToken } = req.body;
 
   const allowedTypes = [
     "introduction",
@@ -113,6 +114,20 @@ app.post("/submit", async (req, res) => {
   }
 
   if (type === "vote") {
+    if (typeof voteToken !== "string" || !voteToken.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Voting session token required"
+      });
+    }
+
+    if (usedVoteTokens.has(voteToken)) {
+      return res.status(409).json({
+        success: false,
+        message: "This voting session has already submitted a vote"
+      });
+    }
+
     if (typeof candidate !== "string" || !candidate.trim()) {
       return res.status(400).json({
         success: false,
@@ -124,6 +139,8 @@ app.post("/submit", async (req, res) => {
       candidate: candidate.trim(),
       timestamp
     });
+
+    usedVoteTokens.add(voteToken);
 
     await sendAdminNotification(
       "Youth Vote - Anonymous Vote Received",
