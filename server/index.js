@@ -24,19 +24,29 @@ app.get("/", (req, res) => {
 
 async function sendAdminNotification(subject, html) {
   if (!resend) {
-    console.log("Email not configured.");
-    return;
+    console.error("RESEND_API_KEY is missing");
+    return false;
   }
 
-  const { error } = await resend.emails.send({
-    from: FROM_EMAIL,
-    to: ADMIN_EMAIL,
-    subject,
-    html
-  });
+  try {
+    const result = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: ADMIN_EMAIL,
+      subject,
+      html
+    });
 
-  if (error) {
-    console.error("Email error:", error);
+    console.log("RESEND RESULT:", JSON.stringify(result));
+
+    if (result.error) {
+      console.error("RESEND ERROR:", JSON.stringify(result.error));
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("RESEND EXCEPTION:", error);
+    return false;
   }
 }
 
