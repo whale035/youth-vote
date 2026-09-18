@@ -12,6 +12,9 @@ const resend = process.env.RESEND_API_KEY
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "nicholaszobo@gmail.com";
 const FROM_EMAIL = process.env.FROM_EMAIL || "onboarding@resend.dev";
 
+const registrations = [];
+const votes = [];
+
 app.use(cors());
 app.use(express.json());
 
@@ -81,6 +84,11 @@ app.post("/submit", async (req, res) => {
   }
 
   if (type === "account") {
+    registrations.push({
+      email: typeof email === "string" ? email : null,
+      timestamp
+    });
+
     await sendAdminNotification(
       "Youth Vote - Account Registration",
       `
@@ -105,13 +113,24 @@ app.post("/submit", async (req, res) => {
   }
 
   if (type === "vote") {
+    if (typeof candidate !== "string" || !candidate.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Candidate selection required"
+      });
+    }
+
+    votes.push({
+      candidate: candidate.trim(),
+      timestamp
+    });
+
     await sendAdminNotification(
-      "Youth Vote - Vote Received",
+      "Youth Vote - Anonymous Vote Received",
       `
-      <h2>Vote received</h2>
+      <h2>Anonymous vote received</h2>
       <p><strong>Time:</strong> ${timestamp}</p>
-      <p>The vote was received successfully.</p>
-      <p>The voter's email and candidate selection are not combined in this notification.</p>
+      <p>A vote was recorded without attaching the voter's email to the candidate selection.</p>
       `
     );
   }
