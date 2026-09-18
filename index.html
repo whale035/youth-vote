@@ -1,0 +1,778 @@
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Youth Vote</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        linear-gradient(135deg, #0066cc, #00a6ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 460px;
+      background: white;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+      position: relative;
+    }
+
+    /* Logo */
+    .logo {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: white;
+      padding: 7px;
+      box-shadow: 0 5px 15px rgba(0,0,0,.15);
+      z-index: 10;
+    }
+
+    .logo svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .page {
+      display: none;
+      padding: 70px 28px 35px;
+      min-height: 560px;
+    }
+
+    .page.active {
+      display: block;
+      animation: fade .35s ease;
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero {
+      text-align: center;
+      margin-top: 35px;
+    }
+
+    .hero-icon {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 25px;
+      border-radius: 50%;
+      background: #e8f5ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+    }
+
+    h1 {
+      color: #073b66;
+      font-size: 30px;
+      margin-bottom: 15px;
+    }
+
+    h2 {
+      color: #073b66;
+      font-size: 25px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      color: #637587;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      color: #173b59;
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #d6e1ea;
+      border-radius: 12px;
+      outline: none;
+      font-size: 16px;
+      transition: .2s;
+    }
+
+    input:focus {
+      border-color: #008cff;
+      box-shadow: 0 0 0 3px rgba(0,140,255,.12);
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0078e8, #00a6ff);
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: .2s;
+      margin-top: 8px;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(0,120,232,.25);
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .secondary {
+      background: #eef6fb;
+      color: #0873bd;
+      box-shadow: none;
+    }
+
+    .otp-box {
+      text-align: center;
+      margin: 25px 0;
+    }
+
+    .otp-box input {
+      text-align: center;
+      letter-spacing: 8px;
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .demo-note {
+      background: #fff8df;
+      border: 1px solid #f1d979;
+      color: #725b00;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 13px;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .candidate {
+      border: 2px solid #e1e9ef;
+      border-radius: 15px;
+      padding: 18px;
+      margin-bottom: 13px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .candidate:hover {
+      border-color: #159cff;
+      background: #f5fbff;
+    }
+
+    .candidate.selected {
+      border-color: #007de8;
+      background: #eaf6ff;
+    }
+
+    .candidate-name {
+      color: #123d5d;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .candidate-description {
+      color: #748797;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    .status {
+      min-height: 22px;
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+      color: #547080;
+    }
+
+    .progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: #e8f0f5;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #008cff;
+      width: 25%;
+      transition: .3s;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 25px;
+      color: #9aaab6;
+      font-size: 12px;
+    }
+
+    .success {
+      text-align: center;
+      padding-top: 70px;
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: #e7f8ee;
+      color: #18a957;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+
+    @media(max-width:480px) {
+      body {
+        padding: 10px;
+      }
+
+      .page {
+        padding-left: 22px;
+        padding-right: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- TOP RIGHT LOGO -->
+  <div class="logo">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="46" fill="#0078e8"/>
+      <path
+        d="M50 20
+           C38 32 30 40 30 53
+           C30 68 39 78 50 78
+           C61 78 70 68 70 53
+           C70 40 62 32 50 20Z"
+        fill="white"/>
+      <circle cx="50" cy="50" r="8" fill="#0078e8"/>
+    </svg>
+  </div>
+
+
+  <!-- PAGE 1 -->
+  <section class="page active" id="page1">
+
+    <div class="hero">
+
+      <div class="hero-icon">
+        🗳️
+      </div>
+
+      <h1>Youth Vote</h1>
+
+      <p>
+        Welcome to the youth leadership voting portal.
+        Create your account and take part in this demonstration
+        of a digital voting process.
+      </p>
+
+      <button onclick="goToPage(2)">
+        Get Started
+      </button>
+
+      <div class="footer">
+        Step 1 of 4
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- PAGE 2 -->
+  <section class="page" id="page2">
+
+    <h2>Create Account</h2>
+
+    <p>
+      Enter your email address and create a password for this
+      demonstration account.
+    </p>
+
+    <form onsubmit="submitAccount(event)">
+
+      <div class="form-group">
+        <label for="email">Email address</label>
+
+        <input
+          type="email"
+          id="email"
+          placeholder="you@example.com"
+          required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Website password</label>
+
+        <input
+          type="password"
+          id="password"
+          placeholder="Create a password"
+          minlength="6"
+          required>
+      </div>
+
+      <button type="submit" id="accountButton">
+        Continue
+      </button>
+
+      <div class="status" id="accountStatus"></div>
+
+    </form>
+
+    <div class="footer">
+      Step 2 of 4
+    </div>
+
+  </section>
+
+
+  <!-- PAGE 3 -->
+  <section class="page" id="page3">
+
+    <h2>Verify Your Account</h2>
+
+    <p>
+      Enter the demonstration verification code below.
+    </p>
+
+    <div class="demo-note">
+      Demo OTP: <strong>123456</strong><br>
+      Unlimited attempts are enabled for this demonstration.
+    </div>
+
+    <div class="otp-box">
+
+      <input
+        type="text"
+        id="otp"
+        maxlength="6"
+        inputmode="numeric"
+        placeholder="••••••">
+
+    </div>
+
+    <button onclick="verifyOTP()">
+      Verify
+    </button>
+
+    <div class="status" id="otpStatus"></div>
+
+    <div class="footer">
+      Step 3 of 4
+    </div>
+
+  </section>
+
+
+  <!-- PAGE 4 -->
+  <section class="page" id="page4">
+
+    <h2>Cast Your Vote</h2>
+
+    <p>
+      Select one candidate for the youth leadership
+      demonstration.
+    </p>
+
+    <div
+      class="candidate"
+      onclick="selectCandidate(this, 'Candidate A')">
+
+      <div class="candidate-name">
+        Candidate A
+      </div>
+
+      <div class="candidate-description">
+        Youth leadership candidate
+      </div>
+
+    </div>
+
+    <div
+      class="candidate"
+      onclick="selectCandidate(this, 'Candidate B')">
+
+      <div class="candidate-name">
+        Candidate B
+      </div>
+
+      <div class="candidate-description">
+        Youth leadership candidate
+      </div>
+
+    </div>
+
+    <div
+      class="candidate"
+      onclick="selectCandidate(this, 'Candidate C')">
+
+      <div class="candidate-name">
+        Candidate C
+      </div>
+
+      <div class="candidate-description">
+        Youth leadership candidate
+      </div>
+
+    </div>
+
+    <button
+      id="voteButton"
+      onclick="submitVote()"
+      disabled>
+
+      Submit Vote
+
+    </button>
+
+    <div class="status" id="voteStatus"></div>
+
+    <div class="footer">
+      Step 4 of 4
+    </div>
+
+  </section>
+
+
+  <!-- SUCCESS -->
+  <section class="page" id="successPage">
+
+    <div class="success">
+
+      <div class="success-icon">
+        ✓
+      </div>
+
+      <h1>Vote Submitted</h1>
+
+      <p>
+        Your demonstration vote has been recorded successfully.
+      </p>
+
+      <button onclick="location.reload()">
+        Return Home
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <div class="progress">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+</div>
+
+
+<script>
+
+  /*
+    Netlify serverless function.
+
+    Create:
+      netlify/functions/submit.js
+
+    The browser sends only non-sensitive event information.
+    Passwords and OTP values are deliberately NOT sent.
+  */
+
+  const API_URL = "/.netlify/functions/submit";
+
+  let currentPage = 1;
+  let selectedCandidate = "";
+  let userEmail = "";
+
+
+  function goToPage(page) {
+
+    document.querySelectorAll(".page")
+      .forEach(pageElement => {
+        pageElement.classList.remove("active");
+      });
+
+    document
+      .getElementById("page" + page)
+      .classList.add("active");
+
+    currentPage = page;
+
+    document.getElementById("progressBar")
+      .style.width = (page * 25) + "%";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+
+  async function sendSubmission(type, data) {
+
+    try {
+
+      const response = await fetch(API_URL, {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          type: type,
+          ...data
+        })
+
+      });
+
+      return response.ok;
+
+    } catch (error) {
+
+      console.log("Demo submission:", error);
+
+      return false;
+    }
+  }
+
+
+  /*
+    PAGE 1
+  */
+
+  async function submitIntroduction() {
+
+    await sendSubmission(
+      "introduction",
+      {
+        action: "started"
+      }
+    );
+
+    goToPage(2);
+  }
+
+
+  /*
+    PAGE 2
+
+    Notice that the password is never sent anywhere.
+  */
+
+  async function submitAccount(event) {
+
+    event.preventDefault();
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    if (!email) return;
+
+    userEmail = email;
+
+    const button =
+      document.getElementById("accountButton");
+
+    const status =
+      document.getElementById("accountStatus");
+
+    button.disabled = true;
+    button.textContent = "Processing...";
+
+    await sendSubmission(
+      "account",
+      {
+        email: email
+      }
+    );
+
+    status.textContent =
+      "Account information received.";
+
+    setTimeout(() => {
+
+      button.disabled = false;
+      button.textContent = "Continue";
+
+      goToPage(3);
+
+    }, 600);
+  }
+
+
+  /*
+    PAGE 3
+
+    The OTP is checked locally for this demonstration.
+    It is NOT sent to the backend.
+  */
+
+  function verifyOTP() {
+
+    const otp =
+      document.getElementById("otp").value.trim();
+
+    const status =
+      document.getElementById("otpStatus");
+
+    if (otp === "123456") {
+
+      status.textContent =
+        "Verification successful.";
+
+      sendSubmission(
+        "verification",
+        {
+          email: userEmail,
+          verified: true
+        }
+      );
+
+      setTimeout(() => {
+        goToPage(4);
+      }, 500);
+
+    } else {
+
+      status.textContent =
+        "Incorrect demo code. Try again.";
+
+    }
+  }
+
+
+  /*
+    PAGE 4
+  */
+
+  function selectCandidate(element, candidate) {
+
+    document.querySelectorAll(".candidate")
+      .forEach(item => {
+        item.classList.remove("selected");
+      });
+
+    element.classList.add("selected");
+
+    selectedCandidate = candidate;
+
+    document.getElementById("voteButton")
+      .disabled = false;
+  }
+
+
+  async function submitVote() {
+
+    if (!selectedCandidate) return;
+
+    const button =
+      document.getElementById("voteButton");
+
+    const status =
+      document.getElementById("voteStatus");
+
+    button.disabled = true;
+    button.textContent = "Submitting...";
+
+    const success = await sendSubmission(
+      "vote",
+      {
+        email: userEmail,
+        candidate: selectedCandidate
+      }
+    );
+
+    if (success || !navigator.onLine === false) {
+
+      status.textContent =
+        "Vote submitted successfully.";
+
+      setTimeout(() => {
+
+        document.querySelectorAll(".page")
+          .forEach(page => {
+            page.classList.remove("active");
+          });
+
+        document
+          .getElementById("successPage")
+          .classList.add("active");
+
+        document.getElementById("progressBar")
+          .style.width = "100%";
+
+      }, 500);
+
+    } else {
+
+      status.textContent =
+        "Unable to submit right now. Please try again.";
+
+      button.disabled = false;
+      button.textContent = "Submit Vote";
+    }
+  }
+
+</script>
+
+</body>
+</html>
