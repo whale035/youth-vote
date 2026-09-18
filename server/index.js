@@ -1,8 +1,10 @@
 const express = require("express");
+const cors = require("cors");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -32,8 +34,7 @@ app.post("/submit", (req, res) => {
   const submission = {
     type,
     email: typeof email === "string" ? email : null,
-    candidate:
-      typeof candidate === "string" ? candidate : null,
+    candidate: typeof candidate === "string" ? candidate : null,
     verified: verified === true ? true : null,
     timestamp: new Date().toISOString()
   };

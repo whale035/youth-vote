@@ -535,7 +535,7 @@
     Passwords and OTP values are deliberately NOT sent.
   */
 
-  const API_URL = "/.netlify/functions/submit";
+  const API_URL = "https://youth-vote.onrender.com/submit";
 
   let currentPage = 1;
   let selectedCandidate = "";
@@ -741,7 +741,7 @@
       }
     );
 
-    if (success || !navigator.onLine === false) {
+    if (success) {
 
       status.textContent =
         "Vote submitted successfully.";
