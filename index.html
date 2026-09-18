@@ -566,34 +566,31 @@
 
 
   async function sendSubmission(type, data) {
-
     try {
-
       const response = await fetch(API_URL, {
-
         method: "POST",
-
         headers: {
           "Content-Type": "application/json"
         },
-
         body: JSON.stringify({
           type: type,
           ...data
         })
-
       });
 
-      return response.ok;
+      const result = await response.json().catch(() => ({}));
 
+      if (!response.ok) {
+        console.log("Server error:", result);
+        return null;
+      }
+
+      return result;
     } catch (error) {
-
-      console.log("Demo submission:", error);
-
-      return false;
+      console.log("Connection error:", error);
+      return null;
     }
   }
-
 
   /*
     PAGE 1
@@ -685,21 +682,18 @@
           email: userEmail,
           verified: true
         }
-      ).then(async response => {
-        if (response && response.voteToken) {
-          voteToken = response.voteToken;
+      ).then(response => {
+        if (!response || !response.voteToken) {
+          status.textContent = "Verification server connection failed.";
+          return;
         }
+
+        voteToken = response.voteToken;
 
         setTimeout(() => {
           goToPage(4);
         }, 500);
       });
-
-      return;
-
-      setTimeout(() => {
-        goToPage(4);
-      }, 500);
 
     } else {
 
@@ -743,7 +737,7 @@
     button.disabled = true;
     button.textContent = "Submitting...";
 
-    const success = await sendSubmission(
+    const result = await sendSubmission(
       "vote",
       {
         candidate: selectedCandidate,
@@ -751,7 +745,7 @@
       }
     );
 
-    if (success) {
+    if (result && result.success) {
 
       status.textContent =
         "Vote submitted successfully.";
