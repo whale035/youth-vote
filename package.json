@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "resend": "^6.28.1",
+    "serverless-http": "^4.0.0"
+  }
+}
